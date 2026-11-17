@@ -1,0 +1,892 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusFlow | Smart Task Scheduling</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f3f5fa;
+  color: #202b43;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  background: #4258d6;
+  color: white;
+}
+
+button:hover { opacity: .88; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 11px;
+  margin: 7px 0 14px;
+  border: 1px solid #dce1eb;
+  border-radius: 7px;
+  background: white;
+}
+
+label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.hidden { display: none !important; }
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg,#172554,#4258d6);
+}
+
+.login-box {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 15px 45px #101c4433;
+}
+
+.logo {
+  color: #4258d6;
+  font-size: 27px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #7b8498;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.role-options {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.role-options button {
+  flex: 1;
+  background: #edf0fb;
+  color: #4258d6;
+}
+
+.role-options button.active {
+  background: #4258d6;
+  color: white;
+}
+
+.login-box .submit {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.demo {
+  background: #f1f4ff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 17px;
+  color: #48557b;
+}
+
+.app-header {
+  background: white;
+  padding: 17px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e8ef;
+  gap: 12px;
+}
+
+.app-header .logo { margin: 0; font-size: 23px; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-right span { font-size: 13px; }
+
+.logout {
+  background: #fff0f0;
+  color: #d04444;
+}
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h1 { font-size: 25px; }
+.welcome p { color: #7b8498; margin-top: 7px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.stat, .panel {
+  background: white;
+  padding: 21px;
+  border-radius: 12px;
+  border: 1px solid #e9ecf3;
+}
+
+.stat p { color: #778096; font-size: 13px; }
+.stat h2 { margin-top: 10px; font-size: 27px; }
+
+.panel { margin-bottom: 20px; }
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 10px;
+}
+
+.panel-heading h2 { font-size: 18px; }
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 15px;
+}
+
+.task {
+  border: 1px solid #e6e9f1;
+  padding: 17px;
+  border-radius: 10px;
+}
+
+.task h3 { font-size: 16px; margin-bottom: 9px; }
+.task p { color: #788197; font-size: 13px; margin: 7px 0; }
+
+.tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: #edf0ff;
+  color: #4258d6;
+  margin: 5px 3px 5px 0;
+}
+
+.priority-high { background: #ffeded; color: #d44343; }
+.priority-medium { background: #fff5df; color: #9c6a00; }
+.priority-low { background: #e9f8ed; color: #238447; }
+
+.progress-track {
+  background: #edf0f5;
+  height: 8px;
+  border-radius: 10px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4258d6;
+}
+
+.task-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.task-actions button { font-size: 12px; padding: 8px 11px; }
+.edit-btn { background: #eaf0ff; color: #4258d6; }
+.delete-btn { background: #fff0f0; color: #d04444; }
+
+.task select { margin-bottom: 0; }
+
+.empty {
+  text-align: center;
+  padding: 35px;
+  color: #8790a3;
+  font-size: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 15px;
+}
+
+.full { grid-column: 1 / -1; }
+
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf0f5;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.member-row:last-child { border: none; }
+
+.small-text { color: #81899b; font-size: 12px; }
+
+@media(max-width:700px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .task-grid { grid-template-columns: 1fr; }
+  .container { padding: 20px 13px; }
+  .app-header { padding: 14px; }
+  .app-header .logo { font-size: 19px; }
+  .header-right span { display: none; }
+}
+
+@media(max-width:420px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .full { grid-column: auto; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<section id="loginPage" class="login-page">
+  <div class="login-box">
+    <div class="logo">CAMPUSFLOW</div>
+    <p class="subtitle">Smart Distributed Task Scheduling System</p>
+
+    <label>Login as</label>
+    <div class="role-options">
+      <button id="facultyRole" class="active"
+        onclick="chooseRole('faculty')">Faculty</button>
+      <button id="studentRole"
+        onclick="chooseRole('student')">Student</button>
+    </div>
+
+    <form id="loginForm">
+      <label>Email address</label>
+      <input id="email" type="email" placeholder="Enter your email" required>
+
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Enter password" required>
+
+      <button class="submit" type="submit">Login to CampusFlow</button>
+    </form>
+
+    <div class="demo">
+      <b>Demo login credentials</b><br>
+      Faculty: faculty@campusflow.com<br>
+      Password: faculty123<br><br>
+      Student 1: student1@campusflow.com<br>
+      Student 2: student2@campusflow.com<br>
+      Student password: student123
+    </div>
+    <p id="loginError" style="color:red;font-size:13px;margin-top:12px"></p>
+  </div>
+</section>
+
+<!-- APPLICATION -->
+<section id="appPage" class="hidden">
+  <header class="app-header">
+    <div class="logo">CAMPUSFLOW</div>
+    <div class="header-right">
+      <span id="userLabel"></span>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="welcome">
+      <h1 id="welcomeTitle"></h1>
+      <p id="welcomeSubtitle"></p>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <p>Total Tasks</p>
+        <h2 id="totalTasks">0</h2>
+      </div>
+      <div class="stat">
+        <p>Pending</p>
+        <h2 id="pendingTasks">0</h2>
+      </div>
+      <div class="stat">
+        <p>In Progress</p>
+        <h2 id="progressTasks">0</h2>
+      </div>
+      <div class="stat">
+        <p>Completed</p>
+        <h2 id="completedTasks">0</h2>
+      </div>
+    </div>
+
+    <!-- FACULTY SECTION -->
+    <section id="facultySection" class="hidden">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2 id="formTitle">Create New Task</h2>
+        </div>
+
+        <form id="taskForm">
+          <input type="hidden" id="editId">
+
+          <div class="form-grid">
+            <div class="full">
+              <label>Task title</label>
+              <input id="taskTitle" placeholder="Enter task title" required>
+            </div>
+
+            <div class="full">
+              <label>Description</label>
+              <textarea id="taskDescription" rows="3"
+                placeholder="Describe the task"></textarea>
+            </div>
+
+            <div>
+              <label>Assign to student</label>
+              <select id="assignee" required>
+                <option value="student1">Student 1</option>
+                <option value="student2">Student 2</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Priority</label>
+              <select id="priority">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Deadline</label>
+              <input type="date" id="deadline" required>
+            </div>
+          </div>
+
+          <button type="submit" id="saveTaskBtn">Create Task</button>
+          <button type="button" class="edit-btn hidden"
+            id="cancelEdit" onclick="resetForm()">Cancel Edit</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Task Management</h2>
+          <span class="small-text">All assigned tasks</span>
+        </div>
+        <div id="facultyTasks" class="task-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Student Workload</h2>
+        </div>
+        <div id="workload"></div>
+      </div>
+    </section>
+
+    <!-- STUDENT SECTION -->
+    <section id="studentSection" class="hidden">
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>My Assigned Tasks</h2>
+        </div>
+        <div id="studentTasks" class="task-grid"></div>
+      </div>
+    </section>
+
+<!-- GEMINI AI TASK ANALYZER -->
+<div class="panel">
+  <div class="panel-heading">
+    <h2>✨ CampusFlow AI Task Analyzer</h2>
+  </div>
+
+  <p>Get AI-powered priority recommendations for your tasks.</p>
+
+  <input
+    type="text"
+    id="aiTitle"
+    placeholder="Enter task title"
+  >
+
+  <textarea
+    id="aiDescription"
+    placeholder="Describe your task"
+    rows="3"
+  ></textarea>
+
+  <input
+    type="date"
+    id="aiDeadline"
+  >
+
+  <button onclick="analyzeTask()">
+    Analyze Task with Gemini AI
+  </button>
+
+  <div id="aiResult" style="margin-top:15px"></div>
+</div>
+
+<!-- CAMPUSFLOW AI CHATBOT -->
+<div class="panel">
+  <div class="panel-heading">
+    <h2>🤖 CampusFlow AI Chatbot</h2>
+  </div>
+
+  <p>Ask me anything about your tasks and deadlines!</p>
+
+  <textarea
+    id="chatMessage"
+    rows="3"
+    placeholder="Type your question here..."
+  ></textarea>
+
+  <button onclick="sendMessage()">Send Message</button>
+
+  <div id="chatResult" style="margin-top:15px; white-space:pre-wrap;"></div>
+</div>
+
+  </main>
+</section>
+
+<script> 
+// DEMO USERS
+const users = [
+  {email:"faculty@campusflow.com",password:"faculty123",
+   role:"faculty",name:"Faculty"},
+  {email:"student1@campusflow.com",password:"student123",
+   role:"student",name:"Student 1",id:"student1"},
+  {email:"student2@campusflow.com",password:"student123",
+   role:"student",name:"Student 2",id:"student2"}
+];
+
+let selectedRole = "faculty";
+let currentUser = null;
+
+// LOAD SAVED TASKS
+let tasks = JSON.parse(localStorage.getItem("campusflowTasks") || "[]");
+
+function saveTasks() {
+  localStorage.setItem("campusflowTasks",JSON.stringify(tasks));
+}
+
+function chooseRole(role) {
+  selectedRole = role;
+  document.getElementById("facultyRole").classList.toggle("active",role==="faculty");
+  document.getElementById("studentRole").classList.toggle("active",role==="student");
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById("appPage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("loginForm").reset();
+  document.getElementById("loginError").textContent = "";
+}
+
+document.getElementById("loginForm").addEventListener("submit",function(e) {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
+
+  const user = users.find(u =>
+    u.email===email && u.password===password && u.role===selectedRole
+  );
+
+  if(!user) {
+    document.getElementById("loginError").textContent =
+      "Invalid email, password or selected role.";
+    return;
+  }
+
+  currentUser = user;
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("appPage").classList.remove("hidden");
+
+  renderDashboard();
+});
+
+function renderDashboard() {
+  const faculty = currentUser.role === "faculty";
+
+  document.getElementById("userLabel").textContent = currentUser.name;
+  document.getElementById("welcomeTitle").textContent =
+    "Welcome, " + currentUser.name + "!";
+  document.getElementById("welcomeSubtitle").textContent =
+    faculty ? "Manage tasks and monitor student progress."
+    : "View your assigned tasks and update your progress.";
+
+  document.getElementById("facultySection").classList.toggle("hidden",!faculty);
+  document.getElementById("studentSection").classList.toggle("hidden",faculty);
+
+  renderTasks();
+}
+
+function visibleTasks() {
+  return currentUser.role==="faculty"
+    ? tasks
+    : tasks.filter(t=>t.assignee===currentUser.id);
+}
+
+function renderTasks() {
+  const list = visibleTasks();
+
+  document.getElementById("totalTasks").textContent = list.length;
+  document.getElementById("pendingTasks").textContent =
+    list.filter(t=>t.status==="Pending").length;
+  document.getElementById("progressTasks").textContent =
+    list.filter(t=>t.status==="In Progress").length;
+  document.getElementById("completedTasks").textContent =
+    list.filter(t=>t.status==="Completed").length;
+
+  if(currentUser.role==="faculty") {
+    document.getElementById("facultyTasks").innerHTML =
+      list.length ? list.map(taskCard).join("")
+      : '<div class="empty full">No tasks created yet. Create your first task!</div>';
+    renderWorkload();
+  } else {
+    document.getElementById("studentTasks").innerHTML =
+      list.length ? list.map(taskCard).join("")
+      : '<div class="empty full">No tasks assigned to you yet.</div>';
+  }
+}
+
+function taskCard(t) {
+  const assigneeName = t.assignee==="student1"?"Student 1":"Student 2";
+
+  return `
+  <div class="task">
+    <h3>${escapeHTML(t.title)}</h3>
+    <p>${escapeHTML(t.description || "No description provided")}</p>
+    <span class="tag priority-${t.priority.toLowerCase()}">${t.priority} Priority</span>
+    <span class="tag">${t.status}</span>
+    <p><b>Assigned to:</b> ${assigneeName}</p>
+    <p><b>Deadline:</b> ${t.deadline}</p>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:${t.progress}%"></div>
+    </div>
+    <p>${t.progress}% completed</p>
+    ${
+      currentUser.role==="faculty"
+      ? `<div class="task-actions">
+          <button class="edit-btn" onclick="editTask('${t.id}')">Edit</button>
+          <button class="delete-btn" onclick="deleteTask('${t.id}')">Delete</button>
+        </div>`
+      : `<label>Update task status</label>
+         <select onchange="updateStatus('${t.id}',this.value)">
+           <option ${t.status==="Pending"?"selected":""}>Pending</option>
+           <option ${t.status==="In Progress"?"selected":""}>In Progress</option>
+           <option ${t.status==="Completed"?"selected":""}>Completed</option>
+         </select>
+         <label>Update progress: <span id="progressValue-${t.id}">${t.progress}%</span></label>
+         <input type="range" min="0" max="100" value="${t.progress}"
+           onchange="updateProgress('${t.id}',this.value)">
+        `
+    }
+  </div>`;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+// CREATE AND EDIT TASK
+document.getElementById("taskForm").addEventListener("submit",function(e) {
+  e.preventDefault();
+
+  const editId = document.getElementById("editId").value;
+
+  const data = {
+    title:document.getElementById("taskTitle").value.trim(),
+    description:document.getElementById("taskDescription").value.trim(),
+    assignee:document.getElementById("assignee").value,
+    priority:document.getElementById("priority").value,
+    deadline:document.getElementById("deadline").value
+  };
+
+  if(editId) {
+    const task = tasks.find(t=>t.id===editId);
+    if(task) Object.assign(task,data);
+  } else {
+    tasks.push({
+      id:Date.now().toString(),
+      ...data,
+      status:"Pending",
+      progress:0
+    });
+  }
+
+  saveTasks();
+  resetForm();
+  renderTasks();
+});
+
+function editTask(id) {
+  const t = tasks.find(t=>t.id===id);
+  if(!t) return;
+
+  document.getElementById("editId").value=t.id;
+  document.getElementById("taskTitle").value=t.title;
+  document.getElementById("taskDescription").value=t.description;
+  document.getElementById("assignee").value=t.assignee;
+  document.getElementById("priority").value=t.priority;
+  document.getElementById("deadline").value=t.deadline;
+
+  document.getElementById("formTitle").textContent="Edit Task";
+  document.getElementById("saveTaskBtn").textContent="Save Changes";
+  document.getElementById("cancelEdit").classList.remove("hidden");
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function resetForm() {
+  document.getElementById("taskForm").reset();
+  document.getElementById("editId").value="";
+  document.getElementById("formTitle").textContent="Create New Task";
+  document.getElementById("saveTaskBtn").textContent="Create Task";
+  document.getElementById("cancelEdit").classList.add("hidden");
+}
+
+function deleteTask(id) {
+  if(!confirm("Are you sure you want to delete this task?")) return;
+
+  tasks=tasks.filter(t=>t.id!==id);
+  saveTasks();
+  renderTasks();
+}
+
+function updateStatus(id,status) {
+  const t=tasks.find(t=>t.id===id);
+  if(!t) return;
+
+  t.status=status;
+  if(status==="Completed") t.progress=100;
+  if(status==="Pending") t.progress=0;
+
+  saveTasks();
+  renderTasks();
+}
+
+function updateProgress(id,value) {
+  const t=tasks.find(t=>t.id===id);
+  if(!t) return;
+
+  t.progress=Number(value);
+  if(t.progress===100) t.status="Completed";
+  else if(t.progress>0) t.status="In Progress";
+  else t.status="Pending";
+
+  saveTasks();
+  renderTasks();
+}
+
+// BASIC WORKLOAD MONITORING
+
+function renderWorkload() {
+  const members = [
+    {id:"student1", name:"Student 1"},
+    {id:"student2", name:"Student 2"}
+  ];
+
+  const workload = members.map(member => ({
+    ...member,
+    count: tasks.filter(t =>
+      t.assignee === member.id &&
+      t.status !== "Completed"
+    ).length
+  }));
+
+  workload.sort((a,b) => a.count - b.count);
+
+  const recommended = workload[0];
+  const available = recommended.count < 3;
+
+  document.getElementById("workload").innerHTML =
+    workload.map(member => `
+      <div class="member-row">
+        <span>
+          <b>${member.name}</b><br>
+          <span class="small-text">
+            Active tasks: ${member.count}
+          </span>
+        </span>
+        <span class="tag ${
+          member.count >= 3 ? "priority-high" : "priority-low"
+        }">
+          ${member.count >= 3 ? "High workload" : "Available"}
+        </span>
+      </div>
+    `).join("") +
+
+    `<div style="background:#edf2ff;padding:15px;border-radius:9px;margin-top:15px">
+      <b>Smart Team Recommendation</b>
+      <p style="margin:10px 0;font-size:14px">
+        ${available
+          ? recommended.name + " is recommended because they have the lowest active workload."
+          : "Both students have high workloads. Consider checking availability before assigning another task."
+        }
+      </p>
+      ${available
+        ? `<button onclick="assignRecommendedStudent('${recommended.id}')">
+             Assign to ${recommended.name}
+           </button>`
+        : ""
+      }
+    </div>`;
+}
+
+function assignRecommendedStudent(id) {
+  document.getElementById("assignee").value = id;
+  document.getElementById("priority").focus();
+  alert("Recommended student selected successfully!");
+}
+
+
+// DEFAULT DEMO TASKS
+if(tasks.length===0) {
+  tasks=[
+    {
+      id:"demo1",
+      title:"Prepare Project Presentation",
+      description:"Prepare the project review slides.",
+      assignee:"student1",
+      priority:"High",
+      deadline:"2026-11-25",
+      status:"In Progress",
+      progress:40
+    },
+    {
+      id:"demo2",
+      title:"Design College Event Poster",
+      description:"Create a poster for the college event.",
+      assignee:"student2",
+      priority:"Medium",
+      deadline:"2026-11-27",
+      status:"Pending",
+      progress:0
+    }
+  ];
+  saveTasks();
+}
+
+async function analyzeTask() {
+  const title = document.getElementById("aiTitle").value;
+  const description = document.getElementById("aiDescription").value;
+  const deadline = document.getElementById("aiDeadline").value;
+
+  const result = document.getElementById("aiResult");
+
+  if (!title || !description || !deadline) {
+    result.innerHTML = "Please fill in all fields.";
+    return;
+  }
+
+  result.innerHTML = "✨ Gemini AI is analyzing your task...";
+
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        deadline
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "AI request failed");
+    }
+
+    result.innerHTML = `
+      <div style="background:#edf2ff;padding:15px;border-radius:10px">
+        <h3>✨ Gemini AI Recommendation</h3>
+        <p style="white-space:pre-wrap">${escapeHTML(data.result)}</p>
+      </div>
+    `;
+
+  } catch (error) {
+    result.textContent = "Error: " + error.message;
+  }
+}
+ 
+async function sendMessage() {
+  const message = document.getElementById("chatMessage").value.trim();
+  const result = document.getElementById("chatResult");
+
+  if (!message) {
+    result.textContent = "Please enter a question.";
+    return;
+  }
+
+  result.textContent = "🤖 Gemini is thinking...";
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Chatbot request failed");
+    }
+
+    result.textContent = "🤖 CampusFlow AI: " + data.reply;
+
+  } catch (error) {
+    result.textContent = "Error: " + error.message;
+  }
+}
+
+</script>
+
+</body>
+</html>
